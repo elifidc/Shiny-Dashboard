@@ -1,0 +1,53 @@
+---
+title: "data-cleaning-and-eda"
+output: html_document
+date: "2025-05-15"
+---
+#Libraries and Packages
+
+```{r}
+#install.packages("readxl")
+library(readxl)
+```
+
+
+```{r}
+raw_df <- read_excel("Coffee Shop Sales.xlsx", sheet = "Transactions")
+head(raw_df)
+str(raw_df)
+
+
+```
+# Data Dictionary 
+### For reference throughout project
+
+Transaction ID: Numerical (Unique identifier for each transaction)
+Transaction Date: Date (Date of the transaction)
+Transaction Time: Time (Time of the transaction)
+Store Number: Numerical (Identifier for the store location)
+Store Location: Text (Location of the store)
+Unit Number: Numerical (Unit number within the store)
+Product Category: Text (Category of the product)
+Product Type: Text (Type of product within the category)
+Product Name: Text (Specific name of the product)
+Price: Numerical (Price of the product)
+Month: Numerical (Month of the transaction)
+Day: Numerical (Day of the month)
+Weekday: Text (Day of the week)
+Hour: Numerical (Hour of the day)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

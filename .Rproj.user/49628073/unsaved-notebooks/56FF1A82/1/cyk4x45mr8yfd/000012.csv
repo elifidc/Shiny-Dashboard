@@ -1,0 +1,16 @@
+"0","raw_df <- read_excel(""Coffee Shop Sales.xlsx"", sheet = ""Transactions"")
+"
+"1","[38;5;232mNew names:
+[36m•[38;5;232m `Month` -> `Month...13`
+[36m•[38;5;232m `Month` -> `Month...14`
+[36m•[38;5;232m `Weekday` -> `Weekday...15`
+[36m•[38;5;232m `Weekday` -> `Weekday...16`[39m
+"
+"0","raw_df <- read_excel(""Coffee Shop Sales.xlsx"", sheet = ""Transactions"")"
+"1","[38;5;232mNew names:
+[36m•[38;5;232m `Month` -> `Month...13`
+[36m•[38;5;232m `Month` -> `Month...14`
+[36m•[38;5;232m `Weekday` -> `Weekday...15`
+[36m•[38;5;232m `Weekday` -> `Weekday...16`[39m
+"
+"0","head(raw_df)"
