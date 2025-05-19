@@ -3,6 +3,49 @@ title: "data-cleaning-and-eda"
 output: html_document
 date: "2025-05-15"
 ---
+
+Note to self: Next to do: Actually clean data to make visualization easier, includes:
+Fix how days of the week, hours, and months are going to display. can't be 1-24, 12am/12pm is more interpretable
+Center titles
+MAKE AXES INTERPRETABLE
+Add interactive
+Days of the week needs to be relabeled
+
+Then, start ui/server file
+
+
+#Color Palette
+```{r}
+#GRADIENT GREENS
+#537D5D
+##9EBC8A
+#73946B
+#D2D0A0
+
+#Grey
+#A9B0B8
+
+#Browns gradient w contrast
+#FFF0DC
+#F0BB78
+#543A14
+#131010
+
+
+#Backup steel blue gradient
+
+#213448
+#547792
+#94B4C1
+#ECEFCA
+
+```
+
+
+
+
+
+
 #Libraries and Packages
 
 ```{r}
@@ -35,6 +78,169 @@ Month: Numerical (Month of the transaction)
 Day: Numerical (Day of the month)
 Weekday: Text (Day of the week)
 Hour: Numerical (Hour of the day)
+
+
+#INITIAL DATA PREPROCESSING AND EXPLORATION
+
+```{r}
+
+library(readxl)
+library(ggplot2)
+library(dplyr)
+
+colnames(df)
+
+```
+
+
+
+### Basic Histograms and Scatterplots to Examine Distributions
+
+
+```{r}
+ggplot(df, aes(x = as.factor(Hour))) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Sales by Hour", x = "Hour of Day", y = "Count")
+```
+```{r}
+ggplot(df, aes(x = `Month...13`)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Sales by Month", x = "Month", y = "Count")
+```
+
+
+
+
+```{r}
+ggplot(df, aes(x = `Weekday...15`)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Sales by Weekday", x = "Day of Week", y = "Count")
+```
+
+```{r}
+ggplot(df, aes(x = store_location)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Sales by Store Location", x = "Store", y = "Count")
+
+```
+
+```{r}
+ggplot(df, aes(x = product_category)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Sales by Product Category", x = "Category", y = "Count")
+```
+```{r}
+top_types <- names(sort(table(df$product_type), decreasing = TRUE))[1:5]
+ggplot(df[df$product_type %in% top_types, ], aes(x = product_type)) +
+  geom_bar(fill = "steelblue") +
+  labs(title = "Top 5 Product Types Sold", x = "Product Type", y = "Count")
+```
+
+
+
+After looking at basic distributions, I am realizing I will likely need to adjust the y-axis for all of these, as there is a steady baseline trend of sales, and we are interested in the differences across different category.
+
+
+```{r}
+head(df)
+```
+
+
+
+I am also just realizing there is a date column, which, if properly formatted, may make for insightful visuals!
+
+
+Creating daily and monthly dataframes
+```{r}
+library(lubridate)
+df$transaction_date <- as.Date(df$transaction_date)
+df$hour <- hour(df$transaction_time)
+
+
+df <- df %>%
+  mutate(
+    weekday = wday(transaction_date, label = TRUE),
+    month = floor_date(transaction_date, "month"),
+    week = floor_date(transaction_date, "week"),
+    day = transaction_date
+  )
+
+head(df)
+
+
+#Daily df
+daily_df <- df %>%
+  group_by(day, store_location, product_category, hour, weekday) %>%
+  summarise(
+    total_revenue = sum(Revenue, na.rm = TRUE),
+    transactions = n(),
+    total_qty = sum(transaction_qty),
+    .groups = "drop"
+  )
+
+#Weekly df
+weekly_df <- df %>%
+  group_by(week, store_location, product_category, weekday) %>%
+  summarise(
+    total_revenue = sum(Revenue, na.rm = TRUE),
+    transactions = n(),
+    total_qty = sum(transaction_qty),
+    .groups = "drop"
+  )
+
+
+
+
+monthly_df <- df %>%
+  group_by(month, store_location, product_category) %>%
+  summarise(
+    total_revenue = sum(Revenue, na.rm = TRUE),
+    transactions = n(),
+    total_qty = sum(transaction_qty),
+    .groups = "drop"
+  )
+```
+
+
+
+I like this, but as one overall plot, and a filter for each product category
+```{r}
+ggplot(monthly_df, aes(x = month, y = total_revenue)) +
+  geom_line(aes(group = product_category, color = product_category), linewidth = 1.2) +
+  labs(title = "Monthly Revenue by Product Category", x = "Month", y = "Revenue") +
+  theme_minimal()
+
+```
+
+
+
+
+Way too cluttered, has to be a better way to show this
+one plot with overall filter?
+```{r}
+ggplot(monthly_df, aes(x = month, y = total_revenue, fill = product_category)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Monthly Revenue by Product Category", x = "Month", y = "Revenue") +
+  theme_minimal()
+```
+
+
+
+
+Axis needs to be fixed
+```{r}
+ggplot(daily_df, aes(x = hour, y = total_revenue)) +
+  geom_col(fill = "darkgreen") +
+  labs(title = "Hourly Revenue Distribution", x = "Hour", y = "Revenue") +
+  theme_minimal()
+
+
+```
+
+
+
+
+
 
 
 
